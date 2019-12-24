@@ -16,7 +16,7 @@ private:
 public:
   // initializers copy in the value. potentially expensive for large values.
   Lattice(const T& _val, Func&& _func) : val(_val), mrg(_func) {};
-  Lattice(const T& _val) : val(_val), mrg(Func()) {};
+  Lattice(const T& _val) : val(_val), mrg(*(new Func)) {};
 
 // This version of operator+ seems lazier, but requires an operator+ in BinaryExpression
 // and even when I added that it was only lazy at the topmost level of the expression tree!
