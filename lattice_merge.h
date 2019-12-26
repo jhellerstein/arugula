@@ -43,6 +43,7 @@ typedef struct UnionStruct
                      std::inserter(*merged, std::begin(*merged)));
 
       T retval = T(*merged);
+      delete merged;
       return (retval);
    }
    friend std::ostream& operator<<(std::ostream& os, const struct UnionStruct m) {
@@ -75,6 +76,7 @@ typedef struct MapUnionStruct
       }
 
       T retval = T(*merged);
+      delete merged;
       return (retval);
    }
    friend std::ostream& operator<<(std::ostream& os, const struct MapUnionStruct m) {

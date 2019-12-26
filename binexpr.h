@@ -5,6 +5,8 @@
 // https://gieseanw.wordpress.com/2019/10/20/we-dont-need-no-stinking-expression-templates/
 // https://wandbox.org/permlink/0byiMsdCFgNw7Bq1
 
+#include <memory>
+
 // C++17’s deduction guides saves the caller the hassle of specifying template arguments 
 // (or us providing a trampoline function like make_binary_expression) when constructing a BinaryExpression
 template<class T, class U, class Callable>
@@ -12,18 +14,18 @@ struct BinaryExpression
 {
 
     private:
-    const T* left = nullptr;
-    const U* right = nullptr;
+    const T left;
+    const U right;
     Callable callable;
 
     public:
     template<class Func>
-    BinaryExpression(const T& _left, const U& _right, Func&& _func) : left{&_left}, right{&_right}, callable{std::forward<Func>(_func)}
+    BinaryExpression(const T& _left, const U& _right, Func&& _func) : left{_left}, right{_right}, callable{std::forward<Func>(_func)}
     {}
     
     auto operator()() const
     {
-        return callable(*left, *right);
+        return callable(left, right);
     }
     
     // Composing BinaryExpressions is made easy if we allow them 
@@ -47,7 +49,7 @@ template<class T, class U>
 auto operator+(T const& lhs, U const& rhs) {
     return BinaryExpression{
         lhs, rhs,
-        [](auto const& l, auto const &r) {
+        [](auto const l, auto const r) {
             return l + r; }    
     };
 }
