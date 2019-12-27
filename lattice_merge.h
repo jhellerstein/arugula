@@ -18,8 +18,8 @@
 // Max merge operator for lattices whose domain has operator>= defined
 typedef struct MaxStruct
 {
-   template<class T, class U>
-   auto operator()(const T& left, const U& right) const
+   template<typename T, typename F, template<typename, typename> class L>
+   auto operator()(const L<T,F>& left, const L<T,F>& right) const
    {
       return (left.reveal() >= right.reveal()) ? left : right;
    }
@@ -32,17 +32,18 @@ typedef struct MaxStruct
 // Union merge operator for lattices whose domain has std::set_union, std::begin and std::end defined
 typedef struct UnionStruct
 {
-   template<class T, class U>
-   auto operator()(const T& left, const U& right) const
+   template<typename T, typename F, template<typename, typename> class L>
+   auto operator()(const L<T,F>& left, const L<T,F>& right) const
    {
       auto l = left.reveal();
       auto r = right.reveal();
-      auto merged = new std::remove_reference_t<decltype(l)>();
+      auto merged = new std::remove_reference_t<T>();
+
 
       std::set_union(std::begin(l), std::end(l), std::begin(r), std::end(r),
                      std::inserter(*merged, std::begin(*merged)));
 
-      T retval = T(*merged);
+      L<T,F> retval(*merged);
       delete merged;
       return (retval);
    }
@@ -55,12 +56,12 @@ typedef struct UnionStruct
 // MapUnion merge operator for lattice whose domain is of type <Map, Lattice<T>>
 typedef struct MapUnionStruct
 {
-   template<class T, class U>
-   auto operator()(const T& left, const U& right) const
+   template<typename T, typename F, template<typename, typename> class L>
+   auto operator()(const L<T,F>& left, const L<T,F>& right) const
    {
       auto l = left.reveal();
       auto r = right.reveal();
-      auto merged = new std::remove_reference_t<decltype(l)>(l);
+      auto merged = new std::remove_reference_t<T>(l);
 
       for (auto &i : r)
       {

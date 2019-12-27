@@ -79,8 +79,8 @@ TEST_CASE ( "Map<IntMax>") {
 }
 
 TEST_CASE ( "Map<SetUnion>") {
-	std::set<int> lefts {10, 20, 30};
-	std::set<int> rights {1, 2, 3};
+	auto lefts = std::set<int> {10, 20, 30};
+	auto rights = std::set<int> {1, 2, 3};
 
 	std::map<std::string, Lattice<std::set<int>, Union> > leftm2 = {
 		{"x", Lattice(lefts, Union{})},
