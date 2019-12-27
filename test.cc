@@ -40,8 +40,19 @@ TEST_CASE ( "Nary IntMax" ) {
 }
 
 TEST_CASE ( "SetUnion" ) {
-	std::set<int> lefts {10, 20, 30};
-	std::set<int> rights {1, 2, 3};
+	// This doesn't compile!
+	// std::set<std::unique_ptr<int> > lefts;
+	// std::set<std::unique_ptr<int> > rights;
+
+	// lefts.insert(std::make_unique<int>(10));
+	// lefts.insert(std::make_unique<int>(20));
+	// lefts.insert(std::make_unique<int>(30));
+	// rights.insert(std::make_unique<int>(1));
+	// rights.insert(std::make_unique<int>(2));
+	// rights.insert(std::make_unique<int>(3));
+
+	std::set<int> lefts({10,20,30});
+	std::set<int> rights({1,2,3});
 
 	Lattice ls(lefts, Union{});
 	Lattice rs(rights, Union{});

@@ -35,17 +35,10 @@ typedef struct UnionStruct
    template<typename T, typename F, template<typename, typename> class L>
    auto operator()(const L<T,F>& left, const L<T,F>& right) const
    {
-      auto l = left.reveal();
-      auto r = right.reveal();
-      auto merged = new std::remove_reference_t<T>();
-
-
-      std::set_union(std::begin(l), std::end(l), std::begin(r), std::end(r),
-                     std::inserter(*merged, std::begin(*merged)));
-
-      L<T,F> retval(*merged);
-      delete merged;
-      return (retval);
+      T l = left.reveal();
+      T r = right.reveal();
+      l.merge(r);
+      return(L<T,F>(l));
    }
    friend std::ostream& operator<<(std::ostream& os, const struct UnionStruct m) {
       os << "Union";
