@@ -41,8 +41,8 @@ TEST_CASE ( "Nary IntMax" ) {
 
 TEST_CASE ( "SetUnion" ) {
 	// This doesn't compile!
-	// std::set<std::unique_ptr<int> > lefts;
-	// std::set<std::unique_ptr<int> > rights;
+	// std::set<std::shared_ptr<int> > lefts;
+	// std::set<std::shared_ptr<int> > rights;
 
 	// lefts.insert(std::make_unique<int>(10));
 	// lefts.insert(std::make_unique<int>(20));
@@ -65,6 +65,49 @@ TEST_CASE ( "SetUnion" ) {
 	}
 	for (auto &i : lefts) {
 		REQUIRE(expr.reveal().find(i) != expr.reveal().end());
+	}
+}
+
+TEST_CASE ( "VectorUnion" ) {
+	std::vector<int> lefts({10,20,30});
+	std::vector<int> rights({1,2,3});
+
+	Lattice ls(lefts, VectorUnion{});
+	Lattice rs(rights, VectorUnion{});
+
+	auto expr = ls + rs;
+
+	REQUIRE(expr.reveal().size() == 6);
+	for (auto &i : lefts) {
+		REQUIRE(std::binary_search(expr.reveal().begin(), expr.reveal().end(), i));
+	}
+	for (auto &i : lefts) {
+		REQUIRE(std::binary_search(expr.reveal().begin(), expr.reveal().end(), i));
+	}
+}
+
+TEST_CASE ( "VectorUnionUnique" ) {
+	// This fails to compile with std::vector<std::unique_ptr<int> >
+	std::vector<std::shared_ptr<int> > lefts;
+	std::vector<std::shared_ptr<int> > rights;
+
+	lefts.push_back(std::move(std::make_unique<int>(10)));
+	lefts.push_back(std::move(std::make_unique<int>(20)));
+	lefts.push_back(std::move(std::make_unique<int>(30)));
+	rights.push_back(std::move(std::make_unique<int>(1)));
+	rights.push_back(std::move(std::make_unique<int>(2)));
+	rights.push_back(std::move(std::make_unique<int>(3)));
+	Lattice ls(lefts, VectorUnion{});
+	Lattice rs(rights, VectorUnion{});
+
+	auto expr = ls + rs;
+
+	REQUIRE(expr.reveal().size() == 6);
+	for (auto &i : lefts) {
+		REQUIRE(std::binary_search(expr.reveal().begin(), expr.reveal().end(), i));
+	}
+	for (auto &i : lefts) {
+		REQUIRE(std::binary_search(expr.reveal().begin(), expr.reveal().end(), i));
 	}
 }
 

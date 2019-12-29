@@ -29,7 +29,7 @@ typedef struct MaxStruct
    }
 } Max;
 
-// Union merge operator for lattices whose domain has std::set_union, std::begin and std::end defined
+// Union merge operator for lattices whose domain has .merge() defined
 typedef struct UnionStruct
 {
    template<typename T, typename F, template<typename, typename> class L>
@@ -45,6 +45,30 @@ typedef struct UnionStruct
       return (os);
    }
 } Union;
+
+// Union merge operator for lattices whose domain has .merge() defined
+typedef struct VectorUnionStruct
+{
+   template<typename T, typename F, template<typename, typename> class L>
+   auto operator()(const L<T,F>& left, const L<T,F>& right) const
+   {
+      const T &l = left.reveal();
+      const T &r = right.reveal();
+      T merged;
+      merged.insert(merged.end(),
+                    std::make_move_iterator(l.begin()),
+                    std::make_move_iterator(l.end()));
+      merged.insert(merged.end(),
+                    std::make_move_iterator(r.begin()),
+                    std::make_move_iterator(r.end()));
+      std::sort(merged.begin(), merged.end());
+      return(L<T,F>(std::move(merged)));
+   }
+   friend std::ostream& operator<<(std::ostream& os, const struct VectorUnionStruct m) {
+      os << "VectorUnion";
+      return (os);
+   }
+} VectorUnion;
 
 // MapUnion merge operator for lattice whose domain is of type <Map, Lattice<T>>
 typedef struct MapUnionStruct
