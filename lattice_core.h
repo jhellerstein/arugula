@@ -11,12 +11,17 @@ template<class T, class Func>
 struct Lattice
 {
 private:
-  const T val;
-  const Func &mrg;
+  T val;
+  const Func mrg;
 public:
-  // initializers copy in the value. potentially expensive for large values.
-  Lattice(const T& _val, Func&& _func) : val(_val), mrg(_func) {};
+  // copy constructors, potentially expensive for large values.
+  Lattice(const T& _val, Func _func) : val(_val), mrg(_func) {};
   Lattice(const T& _val) : val(_val), mrg(Func{}) {};
+
+  // move constructors
+  Lattice(T&& _val, Func _func) : val(std::move(_val)), mrg(_func) {};
+  Lattice(T&& _val) : val(std::move(_val)), mrg(Func{}) {};
+
 
 // This version of operator+ seems lazier, but requires an operator+ in BinaryExpression
 // and even when I added that it was only lazy at the topmost level of the expression tree!
@@ -31,7 +36,7 @@ public:
   // this version of operator+ does eager eval, which maybe we don't want.
   // but it gives us chaining like "x + y + z" WITHOUT requiring an operator+ in BinaryExpression
   Lattice<T, Func> operator+(Lattice<T, Func> &l2) {
-    return Lattice<T, Func>(BinaryExpression<Lattice<T, Func>, Lattice<T, Func>, Func>(*this, l2, merge_op()));
+    return Lattice<T, Func>(BinaryExpression<Lattice<T, Func>, Lattice<T, Func>, Func>(*this, std::move(l2), merge_op()));
   }
 
   BinaryExpression<Lattice<T, Func>, Lattice<T, Func>, Func> operator+(BinaryExpression<Lattice<T, Func>, Lattice<T, Func>, Func> be) {
