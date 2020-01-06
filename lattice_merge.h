@@ -1,7 +1,7 @@
 #ifndef LATTICE_MERGE_H
 #define LATTICE_MERGE_H
 
-// Inspired by:
+// Inspired by expression templates in:
 // https://gieseanw.wordpress.com/2019/10/20/we-dont-need-no-stinking-expression-templates/
 // https://wandbox.org/permlink/0byiMsdCFgNw7Bq1
 

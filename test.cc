@@ -74,10 +74,10 @@ TEST_CASE("Binary IntMax") {
 
 TEST_CASE("Nary IntMax") {
   Lattice li(1, Max{});
-  Lattice ri(40, Max{});
-  Lattice ti(50, Max{});
+  Lattice lj(40, Max{});
+  Lattice lk(50, Max{});
 
-  auto expr = li + ri + ti + li + ri;
+  auto expr = li + lj + lk + li + lj;
   REQUIRE(expr.reveal() == 50);
 }
 
@@ -103,18 +103,18 @@ TEST_CASE("Binary IntMin") {
 
   const Min m;
   Lattice li(1, Min{});
-  Lattice ri(40, Min{});
+  Lattice lj(40, Min{});
 
-  auto expr = li + ri;
+  auto expr = li + lj;
   REQUIRE(expr.reveal() == 1);
 }
 
 TEST_CASE("Nary IntMin") {
   Lattice li(1, Min{});
-  Lattice ri(40, Min{});
-  Lattice ti(50, Min{});
+  Lattice lj(40, Min{});
+  Lattice lk(50, Min{});
 
-  auto expr = li + ri + ti + li + ri;
+  auto expr = li + lj + lk + li + lj;
   REQUIRE(expr.reveal() == 1);
 }
 
