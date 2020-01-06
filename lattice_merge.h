@@ -52,6 +52,18 @@ typedef struct MaxStruct {
   }
 } Max;
 
+// Max merge operator for lattices whose domain has operator<= defined
+typedef struct MinStruct {
+  template <typename T, typename F, template <typename, typename> class L>
+  auto operator()(const L<T, F> &left, const L<T, F> &right) const {
+    return (left.reveal() <= right.reveal()) ? left : right;
+  }
+  friend std::ostream &operator<<(std::ostream &os, const struct MinStruct m) {
+    os << "Min";
+    return (os);
+  }
+} Min;
+
 // Union merge operator for lattices whose domain has .merge() defined
 typedef struct UnionStruct {
   template <typename T, typename F, template <typename, typename> class L>

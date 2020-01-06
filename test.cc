@@ -99,6 +99,43 @@ TEST_CASE("IntMax equality") {
   REQUIRE(l1 != l2);
 }
 
+TEST_CASE("Binary IntMin") {
+
+  const Min m;
+  Lattice li(1, Min{});
+  Lattice ri(40, Min{});
+
+  auto expr = li + ri;
+  REQUIRE(expr.reveal() == 1);
+}
+
+TEST_CASE("Nary IntMin") {
+  Lattice li(1, Min{});
+  Lattice ri(40, Min{});
+  Lattice ti(50, Min{});
+
+  auto expr = li + ri + ti + li + ri;
+  REQUIRE(expr.reveal() == 1);
+}
+
+TEST_CASE("IntMin merges") {
+  Lattice li(1, Min{});
+  Lattice li3(3, Min{});
+  li3 += 2;
+  REQUIRE(li3.reveal() == 2);
+  li3 += li;
+  REQUIRE(li.reveal() == 1);
+}
+
+TEST_CASE("IntMin equality") {
+  Lattice l1(1,Min{});
+  Lattice l2(2,Min{});
+  Lattice l11(1,Min{});
+  REQUIRE(l1 == l11);
+  REQUIRE(!(l1 == l2));
+  REQUIRE(l1 != l2);
+}
+
 TEST_CASE("SetUnion") {
   std::set<int> lefts({1, 20, 30});
   std::set<int> rights({1, 2, 3});
