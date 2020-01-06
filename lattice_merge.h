@@ -28,12 +28,6 @@ typedef struct MaxStruct {
   }
 } Max;
 
-typedef struct PointerCmpStruct {
-  template <typename T> bool operator()(const T &lhs, const T &rhs) const {
-    return pcmp(lhs, rhs);
-  }
-} PointerCmp;
-
 // Union merge operator for lattices whose domain has .merge() defined
 typedef struct UnionStruct {
   template <typename T, typename F, template <typename, typename> class L>

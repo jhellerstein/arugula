@@ -1,4 +1,5 @@
 #ifndef PTR_COMPARE_H
+#define PTR_COMPARE_H
 
 template <typename T> T *ptr(T &obj) {
   return &obj;
@@ -24,7 +25,19 @@ template <typename T> const std::shared_ptr<T> ptr(const std::shared_ptr<T>& obj
   return obj;
 } // obj is already pointer, return it!
 
-template <typename T> bool peq(T &a, T &b) { return (*ptr(a) == *ptr(b)); }
-template <typename T> bool pcmp(T &a, T &b) { return (*ptr(a) < *ptr(b)); }
+template <typename T> bool peq(const T& a, const T& b) { return (*ptr(a) == *ptr(b)); }
+template <typename T> bool pcmp(const T& a, const T& b) { return (*ptr(a) < *ptr(b)); }
 
+
+typedef struct PointerCmpStruct {
+  template <typename T> bool operator()(const T& lhs, const T& rhs) const {
+    return pcmp(lhs, rhs);
+  }
+} PointerCmp;
+
+typedef struct PointerEqStruct {
+  template <typename T> bool operator()(const T& lhs, const T& rhs) const {
+    return peq(lhs, rhs);
+  }
+} PointerEq;
 #endif // PTR_COMPARE_H
