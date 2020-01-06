@@ -41,6 +41,27 @@ TEST_CASE("Nary BoolOr") {
   REQUIRE(expr.reveal() == true);
 }
 
+
+TEST_CASE("Binary BoolAnd") {
+
+  Lattice f(false, And{});
+  Lattice t(true, And{});
+
+  auto expr = f + t;
+  REQUIRE(expr.reveal() == false);
+}
+
+TEST_CASE("Nary BoolAnd") {
+  Lattice f(false, And{});
+  Lattice t(true, And{});
+
+  auto expr = f + t;
+  REQUIRE(expr.reveal() == false);
+
+  expr = f + t + f + f;
+  REQUIRE(expr.reveal() == false);
+}
+
 TEST_CASE("Binary IntMax") {
 
   const Max m;

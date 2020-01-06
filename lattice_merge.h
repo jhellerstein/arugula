@@ -28,6 +28,18 @@ typedef struct OrStruct {
   }
 } Or;
 
+// Bool merge operator for lattices whose domain has operator&& defined
+typedef struct AndStruct {
+  template <typename T, typename F, template <typename, typename> class L>
+  auto operator()(const L<T, F> &left, const L<T, F> &right) const {
+    return left.reveal() && right.reveal();
+  }
+  friend std::ostream &operator<<(std::ostream &os, const struct AndStruct m) {
+    os << "And";
+    return (os);
+  }
+} And;
+
 // Max merge operator for lattices whose domain has operator>= defined
 typedef struct MaxStruct {
   template <typename T, typename F, template <typename, typename> class L>
