@@ -21,6 +21,26 @@
 #include <map>
 #include <set>
 
+TEST_CASE("Binary BoolOr") {
+
+  Lattice f(false, Or{});
+  Lattice t(true, Or{});
+
+  auto expr = f + t;
+  REQUIRE(expr.reveal() == true);
+}
+
+TEST_CASE("Nary BoolOr") {
+  Lattice f(false, Or{});
+  Lattice t(true, Or{});
+
+  auto expr = f + t;
+  REQUIRE(expr.reveal() == true);
+
+  expr = f + t + f + f;
+  REQUIRE(expr.reveal() == true);
+}
+
 TEST_CASE("Binary IntMax") {
 
   const Max m;
