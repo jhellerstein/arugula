@@ -225,6 +225,40 @@ TEST_CASE("SetUnion Wrap") {
   }  
 }
 
+TEST_CASE("SetIntersect") {
+  std::set<int> lefts({1, 2, 30});
+  std::set<int> rights({1, 2, 3});
+
+  Lattice ls(lefts, Intersect{});
+  Lattice rs(rights, Intersect{});
+
+  auto expr = ls + rs;
+
+  REQUIRE(expr.reveal().size() == 2);
+  for (auto &i : {1, 2}) {
+    REQUIRE(expr.reveal().find(i) != expr.reveal().end());
+  }
+}
+
+TEST_CASE("SetIntersect merges") {
+  std::set<int> lefts({1, 2, 30});
+  std::set<int> rights({1, 2, 3});
+  std::set<int> others({2, 300});
+
+  Lattice ls(std::move(lefts), Intersect{});
+  Lattice rs(std::move(rights), Intersect{});
+
+  ls += rs;
+  REQUIRE(ls.reveal().size() == 2);
+  for (auto i : {1,2}) {
+    REQUIRE(ls.reveal().find(i) != ls.reveal().end());
+  }
+
+  ls += others;
+  REQUIRE(ls.reveal().size() == 1);
+  REQUIRE(ls.reveal().find(2) != ls.reveal().end());
+}
+
 TEST_CASE("UnorderedSetUnion") {
   std::unordered_set<int> lefts({1, 20, 30});
   std::unordered_set<int> rights({1, 2, 3});
