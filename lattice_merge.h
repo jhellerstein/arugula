@@ -124,6 +124,7 @@ typedef struct VectorUnionStruct {
 } VectorUnion;
 
 // // Union merge operator for ranges
+// // NOT YET WORKING
 // typedef struct RangeUnionStruct
 // {
 //    template<typename T, typename F, template<typename, typename> class L>
@@ -160,7 +161,7 @@ typedef struct MapUnionStruct {
 
     T retval = T(*merged);
     delete merged;
-    return (retval);
+    return (Lattice(retval, F{}));
   }
   friend std::ostream &operator<<(std::ostream &os,
                                   const struct MapUnionStruct m) {
@@ -183,7 +184,7 @@ inline typename std::enable_if< I != sizeof... (Ts), std::tuple< Ts... >& >::typ
     return operator +=< I + 1, Ts... >(lhs, rhs);
 }
 
-// Max merge operator for lattices of tuples
+// Max merge operator for lattices of tuples of lattices
 typedef struct TupleMergeStruct {
   template <typename M, typename... Ts,
             template <typename, typename> class L>
@@ -200,30 +201,87 @@ typedef struct TupleMergeStruct {
   }
 } TupleMerge;
 
+// Lexicographic Max: not recommended for complex types,
+// relies on Lattice::operator<
+typedef struct LexicoMaxStruct {
+  template <typename T, typename M,
+            template <typename, typename> class L>
+  auto operator()(const L<T, M> &ls, 
+                  const L<T, M> &rs) const {
+    if(rs.reveal() < ls.reveal())
+        return Lattice(ls.reveal(), M{});
+    else return Lattice(rs.reveal(), M{});
+  }
+  friend std::ostream &operator<<(std::ostream &os, const struct LexicoMaxStruct m) {
+    os << "LexicoMax";
+    return (os);
+  }
+} LexicoMax;
+
 // LWW merge (from Anna)
 // LWW merge operator for lattices of pairs (timestamp, val)
+// The following Lexicographic Max is just as good and more general.
 typedef struct LWWStruct {
   template <typename T, typename F,
             template <typename, typename> class L>
-  auto operator()(const L<std::tuple<Lattice<int, Max>, 
+  auto operator()(const L<std::tuple<Lattice<unsigned long long, Max>, 
                                      Lattice<T, F> >, struct LWWStruct> &left, 
-                  const L<std::tuple<Lattice<int, Max>, 
+                  const L<std::tuple<Lattice<unsigned long long, Max>, 
                                      Lattice<T, F> >, struct LWWStruct> &right) const {
-    Lattice<int, Max> lTS = std::get<0>(left.reveal());
-    Lattice<int, Max> rTS = std::get<0>(right.reveal());
-    int maxTS = (lTS + rTS).reveal();
-    int leftTS = std::get<0>(left.reveal()).reveal();
-    auto retval = left;
-    if (maxTS != leftTS) {
-      retval = right;
-    }
-    return retval;
+      LexicoMax lm;
+      return lm(left, right);
+    // here's the code I used prior to reusing LexicoMax
+    // Lattice<unsigned long long, Max> lTS = std::get<0>(left.reveal());
+    // Lattice<unsigned long long, Max> rTS = std::get<0>(right.reveal());
+    // unsigned long long maxTS = (lTS + rTS).reveal();
+    // unsigned long long leftTS = std::get<0>(left.reveal()).reveal();
+    // auto retval = left;
+    // if (maxTS != leftTS) {
+    //   retval = right;
+    // }
+    // return retval;
   }
   friend std::ostream &operator<<(std::ostream &os, const struct LWWStruct m) {
     os << "LWWMerge";
     return (os);
   }
 } LWWMerge;
+
+using VectorClock = Lattice<std::map<std::string, Lattice<unsigned, Max> >, MapUnion>;
+
+
+typedef struct CausalMergeStruct {
+  template <typename T, typename F,
+            template <typename, typename> class L>
+  auto operator()(const L<std::tuple<VectorClock, 
+                                     Lattice<T, F> >, struct CausalMergeStruct> &left, 
+                  const L<std::tuple<VectorClock, 
+                                     Lattice<T, F> >, struct CausalMergeStruct> &right) const {
+    VectorClock vl = std::get<0>(left.reveal());
+    VectorClock vr = std::get<0>(right.reveal());
+    VectorClock prev = vl;
+
+    vl += vr;
+
+    Lattice<T, F> value(std::get<1>(right.reveal())); // set to 
+    if (vl == vr) {
+      // already initialized
+      // value = std::get<1>(right.reveal());
+    } else if (!(vl == prev)) {
+      auto l = std::get<1>(left.reveal());
+      auto r = std::get<1>(right.reveal());
+      value = l + r;
+    }
+    std::tuple<VectorClock,Lattice<T,F> > v(vl, value);
+    struct CausalMergeStruct m;
+    return Lattice(v, m);
+  }
+  friend std::ostream &operator<<(std::ostream &os, const struct CausalMergeStruct m) {
+    os << "CausalMerge";
+    return (os);
+  }
+} CausalMerge;
+
 
 
 #endif // LATTICE_MERGE_H

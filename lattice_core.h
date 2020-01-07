@@ -64,6 +64,8 @@ public:
   // assignment here is reveal assignment as in Anna; arguably should be by ref
   void assign(const Lattice<T,Func>& v) { val = v.reveal(); }
   void operator=(const Lattice<T, Func>& l) { assign(l); };
+  // Not recommended for complex types!
+  bool operator<(const Lattice<T, Func>& rhs) const { return this->reveal() < rhs.reveal(); }
 
   // equality via reveal as in Anna. Arguably should not be defined, but OK.
   // Even if we declare a container with PointerCmp comparison, operator==

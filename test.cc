@@ -470,6 +470,7 @@ TEST_CASE("VectorUnionUnique") {
   }
 }
 
+// NOT YET WORKING
 // TEST_CASE ( "RangeUnion" ) {
 // 	using namespace ranges;
 
@@ -547,11 +548,10 @@ TEST_CASE("Binary Tuple") {
           == std::get<1>(l1.reveal()).reveal());
 }
 
-// From Anna
-TEST_CASE("LWW") {
-  Lattice l1(std::make_tuple(Lattice(0,Max{}), Lattice(10,Max{})), LWWMerge{});
-  Lattice l2(std::make_tuple(Lattice(1,Max{}), Lattice(5,Max{})), LWWMerge{});
-  Lattice l3(std::make_tuple(Lattice(2,Max{}), Lattice(3,Max{})), LWWMerge{});
+TEST_CASE("Lexico") {
+  Lattice l1(std::make_tuple(Lattice(static_cast<unsigned long long>(0),Max{}), Lattice(10,Max{})), LexicoMax{});
+  Lattice l2(std::make_tuple(Lattice(static_cast<unsigned long long>(1),Max{}), Lattice(5,Max{})), LexicoMax{});
+  Lattice l3(std::make_tuple(Lattice(static_cast<unsigned long long>(2),Max{}), Lattice(3,Max{})), LexicoMax{});
 
   auto expr = l1 + l2;
   REQUIRE(std::get<0>(expr.reveal()).reveal() 
@@ -563,4 +563,45 @@ TEST_CASE("LWW") {
           == std::get<0>(l3.reveal()).reveal());
   REQUIRE(std::get<1>(expr.reveal()).reveal() 
           == std::get<1>(l3.reveal()).reveal());
+}
+
+// From Anna
+TEST_CASE("LWW") {
+  Lattice l1(std::make_tuple(Lattice(static_cast<unsigned long long>(0),Max{}), Lattice(10,Max{})), LWWMerge{});
+  Lattice l2(std::make_tuple(Lattice(static_cast<unsigned long long>(1),Max{}), Lattice(5,Max{})), LWWMerge{});
+  Lattice l3(std::make_tuple(Lattice(static_cast<unsigned long long>(2),Max{}), Lattice(3,Max{})), LWWMerge{});
+
+  auto expr = l1 + l2;
+  REQUIRE(std::get<0>(expr.reveal()).reveal() 
+          == std::get<0>(l2.reveal()).reveal());
+  REQUIRE(std::get<1>(expr.reveal()).reveal() 
+          == std::get<1>(l2.reveal()).reveal());
+  expr += l3;
+  REQUIRE(std::get<0>(expr.reveal()).reveal() 
+          == std::get<0>(l3.reveal()).reveal());
+  REQUIRE(std::get<1>(expr.reveal()).reveal() 
+          == std::get<1>(l3.reveal()).reveal());
+}
+
+TEST_CASE("Single key causal") {
+  //  using VectorClock = Lattice<std::map<std::string, Lattice<unsigned, Max> >, MapUnion>;
+  VectorClock vc1({{"x", Lattice(static_cast<unsigned>(2), Max{})},
+                   {"y", Lattice(static_cast<unsigned>(4), Max{})}});
+  VectorClock vc2({{"x", Lattice(static_cast<unsigned>(3), Max{})},
+                   {"y", Lattice(static_cast<unsigned>(5), Max{})}});
+  VectorClock vc3({{"x", Lattice(static_cast<unsigned>(1), Max{})},
+                   {"y", Lattice(static_cast<unsigned>(6), Max{})}});
+  const std::set<std::string> jset({"Joe"});
+  const std::set<std::string> bset({"Bob"});
+  const std::set<std::string> aset({"Alice"});
+  Lattice l1(std::make_tuple(vc1, Lattice(jset, Union{})), CausalMerge{});
+  Lattice l2(std::make_tuple(vc2, Lattice(bset, Union{})), CausalMerge{});
+  Lattice l3(std::make_tuple(vc3, Lattice(aset, Union{})), CausalMerge{});
+
+  CausalMerge m;
+  auto expr = l1+l2;
+  REQUIRE(expr == l2);
+  expr = l2+l3;
+  REQUIRE(expr != l2);
+  REQUIRE(expr != l3);
 }
