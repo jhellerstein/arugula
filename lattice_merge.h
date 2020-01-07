@@ -169,4 +169,61 @@ typedef struct MapUnionStruct {
   }
 } MapUnion;
 
+// from https://stackoverflow.com/questions/4832949/c-iterating-over-a-tuple-resolution-of-type-vs-constant-parameters
+template< std::size_t I = 0, typename... Ts >
+inline typename std::enable_if< I == sizeof... (Ts), std::tuple< Ts... >& >::type operator +=(std::tuple< Ts... >& lhs, const std::tuple< Ts... >& rhs)
+{
+    return lhs;
+}
+
+template< std::size_t I = 0, typename... Ts >
+inline typename std::enable_if< I != sizeof... (Ts), std::tuple< Ts... >& >::type operator +=(std::tuple< Ts... >& lhs, const std::tuple< Ts... >& rhs)
+{
+    std::get< I >(lhs) += std::get< I >(rhs);
+    return operator +=< I + 1, Ts... >(lhs, rhs);
+}
+
+// Max merge operator for lattices of tuples
+typedef struct TupleMergeStruct {
+  template <typename M, typename... Ts,
+            template <typename, typename> class L>
+  auto operator()(const L<std::tuple<Ts...>, M> &ls, 
+                  const L<std::tuple<Ts...>, M> &rs) const {
+    auto retval = ls.reveal();
+    retval += rs.reveal();
+
+    return Lattice(retval, M{});
+  }
+  friend std::ostream &operator<<(std::ostream &os, const struct TupleMergeStruct m) {
+    os << "TupleMerge";
+    return (os);
+  }
+} TupleMerge;
+
+// LWW merge (from Anna)
+// LWW merge operator for lattices of pairs (timestamp, val)
+typedef struct LWWStruct {
+  template <typename T, typename F,
+            template <typename, typename> class L>
+  auto operator()(const L<std::tuple<Lattice<int, Max>, 
+                                     Lattice<T, F> >, struct LWWStruct> &left, 
+                  const L<std::tuple<Lattice<int, Max>, 
+                                     Lattice<T, F> >, struct LWWStruct> &right) const {
+    Lattice<int, Max> lTS = std::get<0>(left.reveal());
+    Lattice<int, Max> rTS = std::get<0>(right.reveal());
+    int maxTS = (lTS + rTS).reveal();
+    int leftTS = std::get<0>(left.reveal()).reveal();
+    auto retval = left;
+    if (maxTS != leftTS) {
+      retval = right;
+    }
+    return retval;
+  }
+  friend std::ostream &operator<<(std::ostream &os, const struct LWWStruct m) {
+    os << "LWWMerge";
+    return (os);
+  }
+} LWWMerge;
+
+
 #endif // LATTICE_MERGE_H
