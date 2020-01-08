@@ -1,12 +1,16 @@
 #ifndef LATTICE_CORE_H
 #define LATTICE_CORE_H
 
+// Inspired by expression templates in:
+// https://gieseanw.wordpress.com/2019/10/20/we-dont-need-no-stinking-expression-templates/
+// https://wandbox.org/permlink/0byiMsdCFgNw7Bq1
+
 // Has not been tuned for memory or performance efficiency
 
 #include <iostream>
 #include "binexpr.h"
-#include "is_container.h"
-#include "ptr_compare.h"
+#include "utils/is_container.h"
+#include "utils/ptr_compare.h"
 
 
 template<class T, class Func>

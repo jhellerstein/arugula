@@ -2,24 +2,21 @@
                           // in one cpp file
 #include "catch.hpp"
 
-// unsigned int Factorial( unsigned int number ) {
-//     return number <= 1 ? number : Factorial(number-1)*number;
-// }
-
-// TEST_CASE( "Factorials are computed", "[factorial]" ) {
-// 	REQUIRE( Factorial(0) == 1 );
-//     REQUIRE( Factorial(1) == 1 );
-//     REQUIRE( Factorial(2) == 2 );
-//     REQUIRE( Factorial(3) == 6 );
-//     REQUIRE( Factorial(10) == 3628800 );
-// }
-
-#include "collection_io.h"
-#include "lattice_core.h"
-#include "lattice_merge.h"
 #include <iostream>
 #include <map>
 #include <set>
+#include "lattice_core.h"
+#include "utils/collection_io.h"
+#include "merges/boolean_mrg.h"
+#include "merges/causal_mrg.h"
+#include "merges/lww_mrg.h"
+#include "merges/map_mrg.h"
+#include "merges/maxmin_mrg.h"
+#include "merges/setop_mrg.h"
+#include "merges/tuple_mrg.h"
+#include "merges/vector_mrg.h"
+#include "merges/vector_clock_mrg.h"
+
 
 TEST_CASE("Binary BoolOr") {
 
