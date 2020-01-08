@@ -1,7 +1,7 @@
 #ifndef LWW_MRG_H
 #define LWW_MRG_H
 
-#include "maxmin_mrg.h"
+#include "maxmin_mrg.hpp"
 
 // LWW merge (from Anna)
 // LWW merge operator for lattices of pairs (timestamp, val)

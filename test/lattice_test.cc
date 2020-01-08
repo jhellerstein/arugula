@@ -5,17 +5,17 @@
 #include <iostream>
 #include <map>
 #include <set>
-#include "lattice_core.h"
-#include "utils/collection_io.h"
-#include "merges/boolean_mrg.h"
-#include "merges/causal_mrg.h"
-#include "merges/lww_mrg.h"
-#include "merges/map_mrg.h"
-#include "merges/maxmin_mrg.h"
-#include "merges/setop_mrg.h"
-#include "merges/tuple_mrg.h"
-#include "merges/vector_mrg.h"
-#include "merges/vector_clock_mrg.h"
+#include "lattice_core.hpp"
+#include "utils/collection_io.hpp"
+#include "merges/boolean_mrg.hpp"
+#include "merges/causal_mrg.hpp"
+#include "merges/lww_mrg.hpp"
+#include "merges/map_mrg.hpp"
+#include "merges/maxmin_mrg.hpp"
+#include "merges/setop_mrg.hpp"
+#include "merges/tuple_mrg.hpp"
+#include "merges/vector_mrg.hpp"
+#include "merges/vector_clock_mrg.hpp"
 
 
 TEST_CASE("Binary BoolOr") {

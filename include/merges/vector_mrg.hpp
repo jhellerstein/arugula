@@ -2,7 +2,7 @@
 #define VECTOR_OP_H
 
 #include <algorithm>
-#include "../utils/ptr_compare.h"
+#include "../utils/ptr_compare.hpp"
 
 // Union merge operator for lattices whose domain has .merge() defined
 typedef struct VectorUnionStruct {

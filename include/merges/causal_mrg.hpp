@@ -1,7 +1,7 @@
 #ifndef CAUSAL_MRG_H
 #define CAUSAL_MRG_H
 
-#include "vector_clock_mrg.h"
+#include "vector_clock_mrg.hpp"
 
 typedef struct CausalMergeStruct {
   template <typename T, typename F,

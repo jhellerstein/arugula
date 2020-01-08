@@ -8,9 +8,9 @@
 // Has not been tuned for memory or performance efficiency
 
 #include <iostream>
-#include "binexpr.h"
-#include "utils/is_container.h"
-#include "utils/ptr_compare.h"
+#include "binexpr.hpp"
+#include "utils/is_container.hpp"
+#include "utils/ptr_compare.hpp"
 
 
 template<class T, class Func>

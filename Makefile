@@ -1,24 +1,22 @@
-CC=g++
-CFLAGS=--std=c++17 -g # -fsanitize=address -fno-omit-frame-pointer
-OBJ = test.o
-MRG_DIR = "merges"
-MERGES = $(shell find $(MRG_DIR) -name "*.h" -type f)
-UTILS_DIR = "merges"
-UTILS = $(shell find $(UTILS_DIR) -name "*.h" -type f)
+INCLUDE = "include"
+CXX=g++
+CFLAGS=-I${INCLUDE} --std=c++17 -g # -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS = 
+DEPS = $(wildcard $(INCLUDE)/*.hpp) $(wildcard $(INCLUDE)/*/*.hpp)
+CCSRC = $(wildcard test/*.cc)
+OBJ = $(CCSRC:.cc=.o)
+BINARIES = lattice_test
 
-DEPS = lattice_core.h lattice_merge.h binexpr.h
-BINARIES = test
+%.o: %.cc $(DEPS)
+	$(CXX) -c -o $@ $< $(CFLAGS)
 
-%.o: %.cc $(DEPS) ${MERGES} ${UTILS}
-	$(CC) -c -o $@ $< $(CFLAGS)
-
-test: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+lattice_test: $(OBJ)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 valgrind:  $(test)
-	valgrind --leak-check=yes ./test
+	valgrind --leak-check=yes lattice_test
 
 .PHONY: clean
 
 clean:
-	rm -f *.o $(BINARIES)
+	rm -f $(OBJ) $(BINARIES)
