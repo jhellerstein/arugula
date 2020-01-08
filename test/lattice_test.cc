@@ -140,7 +140,7 @@ TEST_CASE("SetUnion") {
   Lattice ls(lefts, Union{});
   Lattice rs(rights, Union{});
 
-  auto expr = ls + rs;
+  Lattice<std::set<int>, Union> expr = ls + rs;
 
   REQUIRE(expr.reveal().size() == 5);
   for (auto &i : lefts) {
