@@ -3,18 +3,18 @@ CXX=g++
 CFLAGS=-I${INCLUDE} --std=c++17 -g # -fsanitize=address -fno-omit-frame-pointer
 LDFLAGS = 
 DEPS = $(wildcard $(INCLUDE)/*.hpp) $(wildcard $(INCLUDE)/*/*.hpp)
-CCSRC = $(wildcard test/*.cc)
-OBJ = $(CCSRC:.cc=.o)
+CPPSRC = $(wildcard test/*.cpp)
+OBJ = $(CPPSRC:.cpp=.o)
 BINARIES = lattice_test
 
-%.o: %.cc $(DEPS)
+%.o: %.cpp $(DEPS)
 	$(CXX) -c -o $@ $< $(CFLAGS)
 
 lattice_test: $(OBJ)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-valgrind:  $(test)
-	valgrind --leak-check=yes lattice_test
+valgrind:  $(BINARIES)
+	valgrind --leak-check=yes ./$(BINARIES)
 
 .PHONY: clean
 
