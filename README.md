@@ -17,7 +17,7 @@ For example, the code below builds two lattices `lefts` and `rights`. Each has t
 ```
 
 ### Lattice composition
-The test directory shows many more examples of how to build lattices using standard C++ types and the merge functors. Among the more interesting examples are lattices composed of other lattices, e.g. in `include/merges/vector_clock_mrg.h`:
+The `test/smoke` directory shows many more examples of how to build lattices using standard C++ types and the merge functors. Among the more interesting examples are lattices composed of other lattices, e.g. in `include/merges/vector_clock_mrg.h`:
 
 ```c++
 using VectorClock = Lattice<std::map<std::string, Lattice<unsigned, Max> >, MapUnion>;
