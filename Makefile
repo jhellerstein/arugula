@@ -1,20 +1,30 @@
-INCLUDE = "include"
+INCLUDE=include
 CXX=g++
-CFLAGS=-I${INCLUDE} --std=c++17 -g # -fsanitize=address -fno-omit-frame-pointer
+CFLAGS=-I${INCLUDE} --std=c++17 -g -DCATCH_CONFIG_ENABLE_BENCHMARKING # -fsanitize=address -fno-omit-frame-pointer
 LDFLAGS = 
 DEPS = $(wildcard $(INCLUDE)/*.hpp) $(wildcard $(INCLUDE)/*/*.hpp)
-CPPSRC = $(wildcard test/*.cpp) $(wildcard test/*/*.cpp)
-OBJ = $(CPPSRC:.cpp=.o)
-BINARIES = smoke
+SMOKE_SRC = $(wildcard test/smoke/*.cpp)
+SMOKE_OBJ = $(SMOKE_SRC:.cpp=.o)
+PERF_SRC = $(wildcard test/perf/*.cpp)
+PERF_OBJ = $(PERF_SRC:.cpp=.o)
+OBJ = ${SMOKE_OBJ} ${PERF_OBJ}
+BINARIES = smoke perf
+
+print-%: ; @echo $* is $($*)
 
 %.o: %.cpp $(DEPS)
 	$(CXX) -c -o $@ $< $(CFLAGS)
 
-smoke: $(OBJ)
+all: smoke perf
+
+smoke: $(SMOKE_OBJ)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-valgrind:  $(BINARIES)
-	valgrind --leak-check=yes ./$(BINARIES)
+perf: $(PERF_OBJ)
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+valgrind:  $(SMOKE_OBJ)
+	valgrind --leak-check=yes ./smoke
 
 .PHONY: clean
 
